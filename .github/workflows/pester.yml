@@ -1,0 +1,21 @@
+name: PowerShell Pester Tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up PowerShell
+      uses: microsoft/powershell@v1
+
+    - name: Install Pester
+      run: Install-Module -Name Pester -Force -SkipPublisherCheck
+
+    - name: Run Pester Tests
+      run: |
+        # Replace 'Tests/' with the path to your Pester test files
+        Invoke-Pester -Path '/secure.tests.ps1'

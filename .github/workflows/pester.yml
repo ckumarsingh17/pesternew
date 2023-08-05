@@ -1,23 +1,27 @@
-name: PowerShell Pester Tests
+name: powershell-yaml
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+permissions: {}
 
 jobs:
-  test:
+  tests:
+    name: Pester tests
     runs-on: windows-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-
-    - name: Set up PowerShell
-      uses: PowerShell/setup-powershell@v1
-      with:
-        pwsh-version: '7.0'  # Change to the version of PowerShell you want to use
-
-    - name: Install Pester
-      run: Install-Module -Name Pester -Force -SkipPublisherCheck
-
-    - name: Run Pester Tests
-      run: |
-        # Replace 'Tests/' with the path to your Pester test files
-        Invoke-Pester -Path '/secure.tests.ps1'
+        
+     steps:
+      - uses: actions/checkout@v3
+      - name: Install modules
+        shell: pwsh
+        run: |
+          Set-PSRepository PSGallery -InstallationPolicy Trusted
+          Install-Module Assert -ErrorAction Stop
+          Install-Module Pester -ErrorAction Stop
+      - name: Run tests
+        shell: pwsh
+        run: |
+          Invoke-Pester -Path '/secure.tests.ps1'

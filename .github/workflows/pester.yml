@@ -1,27 +1,27 @@
-name: powershell-yaml
+name: pesterscan
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - main
   pull_request:
-    branches: [ master ]
-
-permissions: {}
 
 jobs:
-  tests:
-    name: Pester tests
+  analyze_scripts:
     runs-on: windows-latest
-        
-     steps:
-      - uses: actions/checkout@v3
-      - name: Install modules
-        shell: pwsh
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Download and install PowerShell Core
         run: |
-          Set-PSRepository PSGallery -InstallationPolicy Trusted
-          Install-Module Assert -ErrorAction Stop
-          Install-Module Pester -ErrorAction Stop
-      - name: Run tests
+          $url = 'https://github.com/PowerShell/PowerShell/releases/latest/download/PowerShell-Preview.win-x64.msi'
+          $path = "$env:TEMP\PowerShell-Preview.win-x64.msi"
+          Invoke-WebRequest -Uri $url -OutFile $path
+          Start-Process -FilePath $path -ArgumentList "/quiet" -Wait
+
+      - name: Run tests  
         shell: pwsh
         run: |
           Invoke-Pester -Path '/secure.tests.ps1'
